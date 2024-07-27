@@ -6,11 +6,14 @@ import { createServer } from "http";
 import { corsConfig } from "./config/cors.config";
 
 import logger from "./services/logger.service";
+import handleErrors from "./middlewares/error.middleware";
 
 const app = express();
 
 app.use(express.json());
 app.use(helmet());
+
+app.use(handleErrors);
 app.use(cors(corsConfig));
 app.use(logger);
 
