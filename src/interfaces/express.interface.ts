@@ -10,19 +10,11 @@ interface IRequest<B = undefined, P = undefined, Q = undefined> extends Req {
   params: P & ParamsDictionary;
 };
 
-interface IRequestUser<B = undefined, P = undefined, Q = undefined> extends Req {
-  body: B;
-  query: Q & ParsedQs;
-  params: P & ParamsDictionary;
-
-  user: any;
-};
-
 export interface Response extends Res { };
 export interface Next extends NextFunction { };
 
 export type Request<B = undefined, P = undefined, Q = undefined> = (request: IRequest<B, P, Q>, response: Response) => Promise<Response>;
-export type RequestUser<B = undefined, P = undefined, Q = undefined> = (request: IRequestUser<B, P, Q>, response: Response) => Promise<Response>;
 
+export type AuthMiddleware = (request: IRequest, response: Response, next: Next) => void;
 export type ErrorMiddleware = (error: Error, request: IRequest, response: Response, next: Next) => Response;
-export type ValidationMiddleware = (schema: ZodTypeAny, property?: IProperty) => (request: IRequestUser, response: Response, next: Next) => void;
+export type ValidationMiddleware = (schema: ZodTypeAny, property?: IProperty) => (request: IRequest, response: Response, next: Next) => void;
