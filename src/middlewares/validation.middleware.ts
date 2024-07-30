@@ -6,5 +6,3 @@ export const validateRequest: ValidationMiddleware = (schema, property) => (requ
 
     next();
 };
-
-export default validateRequest;

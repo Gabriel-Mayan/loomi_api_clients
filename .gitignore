@@ -4,3 +4,5 @@ package-lock*
 yarn.lock
 
 .env
+
+build/
