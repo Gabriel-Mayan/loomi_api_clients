@@ -6,4 +6,5 @@ export type IRequestUpdateUser = z.infer<typeof updateUserSchema>;
 
 export type IDatabaseUser = {
     id: string;
+    password: string
 };
