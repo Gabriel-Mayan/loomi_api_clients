@@ -11,8 +11,8 @@ export const createUserSchema = z.object({
   password: z.string().min(6),
   confirmPassword: z.string().min(6),
 }).refine(data => data.password === data.confirmPassword, {
+  path: ["confirmPassword"],
   message: "Password and confirmPassword must match",
-  path: ["confirmPassword"], // indica que a validação falha em confirmPassword
 });
 
 export const updateUserSchema = z.object({
