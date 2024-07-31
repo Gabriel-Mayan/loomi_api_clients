@@ -9,6 +9,7 @@ import { addTime, isAfterDate } from '../utils/date.util';
 import { encryptPassword } from '../utils/encryptation.util';
 
 import { recoveryPasswordMailSend } from '../helpers/mail.helper';
+import { InternalError, NotFoundError, RequestFieldError } from '../services/error.service';
 
 export const getUserById: Request = async (request, response) => {
     const { id } = request.params;
@@ -25,7 +26,7 @@ export const createUser: Request<IRequestCreateUser> = async (request, response)
 
     await UserRepository.createUser({ cpf, name, email, address, password: encryptedPassword });
 
-    return response.status(200).send({ message: "Usuario cadastrado com sucesso!" });
+    return response.status(200).send({ message: "User registered successfully!" });
 };
 
 export const updateUser: Request<IRequestUpdateUser> = async (request, response) => {
@@ -35,10 +36,10 @@ export const updateUser: Request<IRequestUpdateUser> = async (request, response)
     const updatedUser = await UserRepository.updateUser({ id: user.id, email, address });
 
     if (!updatedUser.affected) {
-        throw new Error("Erro ao atualizar usuario");
+        throw new RequestFieldError("Error updating user");
     }
 
-    return response.status(200).send({ message: "Usuario atualizado com sucesso!" });
+    return response.status(200).send({ message: "User updated successfully!" });
 };
 
 export const deleteUser: Request = async (request, response) => {
@@ -47,10 +48,10 @@ export const deleteUser: Request = async (request, response) => {
     const userDeleted = await UserRepository.deleteUser({ id: user.id });
 
     if (!userDeleted.affected) {
-        throw new Error("Erro ao deletar usuario");
+        throw new RequestFieldError("Error when deleting user...");
     }
 
-    return response.status(200).send({ message: "Usuario deletado com sucesso!" });
+    return response.status(200).send({ message: "User deleted successfully!" });
 };
 
 // TODO
@@ -69,7 +70,7 @@ export const requestUserPasswordRecoveryLink: Request<IRequestUserPasswordRecove
     const user = await UserRepository.findUser({ email });
 
     if (!user) {
-        throw new Error("User does not exist");
+        throw new NotFoundError("User does not exist");
     }
 
     const databaseRecovery = await RecoveryPasswordRepository.createRecovery({
@@ -78,7 +79,7 @@ export const requestUserPasswordRecoveryLink: Request<IRequestUserPasswordRecove
     });
 
     if (!databaseRecovery.identifiers.length) {
-        throw new Error("Recovery does not created");
+        throw new InternalError("Error when create request...");
     }
 
     await recoveryPasswordMailSend({ to: user.email, code: databaseRecovery.identifiers[0] });
@@ -93,21 +94,21 @@ export const updateUserPasswordWithRecoveryLink: Request = async (request, respo
     const registeredRequest = await RecoveryPasswordRepository.findRecovery({ id: code });
   
     if (!registeredRequest || !registeredRequest.mailSent) {
-        throw new Error("Request does not exist");
+        throw new RequestFieldError("Request does not exist...");
     }
   
     const expiredTime = isAfterDate(new Date(), registeredRequest.expiresIn);
   
     if (expiredTime) {
-        throw new Error("Request error: expired uuid.");
+        throw new RequestFieldError("Request timeout expired...");
     }
   
     const newPassword = await encryptPassword(password);
     const userUpdated = await UserRepository.updateUser({id: registeredRequest.user.id, password: newPassword });
   
     if (!userUpdated.affected) {
-        throw new Error("unable to update password.");
+        throw new InternalError("Error when updating password....");
     }
   
-    return response.status(200).send({ message: "password retrieved successfully!" });
+    return response.status(200).send({ message: "Password retrieved successfully!" });
 };

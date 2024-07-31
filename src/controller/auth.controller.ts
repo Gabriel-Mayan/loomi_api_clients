@@ -4,6 +4,7 @@ import { IRequestLogin } from '../interfaces/auth.interface';
 import { UserRepository } from '../repositories/user.repository';
 import { comparePassword } from '../utils/encryptation.util';
 import { generateUserToken } from '../utils/token.util';
+import { RequestFieldError } from '../services/error.service';
 
 export const login: Request<IRequestLogin> = async (request, response) => {
     const { email, password } = request.body;
@@ -11,13 +12,13 @@ export const login: Request<IRequestLogin> = async (request, response) => {
     const user = await UserRepository.findUser({ email });
 
     if (!user) {
-      throw new Error("Username or password is invalid");
+      throw new RequestFieldError("Username or password is invalid");
     }
 
     const verifiedPassword = await comparePassword(password, user.password);
 
     if (!verifiedPassword) {
-        throw new Error("Username or password is invalid");
+      throw new RequestFieldError("Username or password is invalid");
     };
 
     const token = generateUserToken({ email });
