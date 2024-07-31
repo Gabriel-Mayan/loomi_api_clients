@@ -38,8 +38,8 @@ export const UserRepository = {
         });
     },
 
-    updateUser({ id, address, email }: { id: string, email?: string, address?: string }): Promise<UpdateResult> {
-        return repository.update({ id }, { address, email });
+    updateUser({ id, address, email, password }: { id: string, email?: string, address?: string, password?: string }): Promise<UpdateResult> {
+        return repository.update({ id }, { address, email, password });
     },
 
     deleteUser({ id }: { id: string }): Promise<UpdateResult> {

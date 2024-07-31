@@ -1,5 +1,5 @@
 // TODO
-export const recoveryPasswordMailSend = async ({ message }: { message: any }) => {
+export const recoveryPasswordMailSend = async ({ to, code }: { to: string, code: any }) => {
 
 };
 

@@ -19,3 +19,7 @@ export const updateUserSchema = z.object({
   email: z.string().email().optional(),
   address: z.string().optional(),
 });
+
+export const requestUserPasswordRecoveryLinkSchema = z.object({
+  email: z.string().email(),
+});
