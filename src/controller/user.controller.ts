@@ -18,7 +18,7 @@ export const createUser: Request<IRequestCreateUser> = async (request, response)
 
     const encryptedPassword = await encryptPassword(password);
 
-    await UserRepository.createUser({ cpf, name, email, address, password });
+    await UserRepository.createUser({ cpf, name, email, address, password: encryptedPassword });
 
     return response.status(200).send({ message: "Usuario cadastrado com sucesso!" });
 };
