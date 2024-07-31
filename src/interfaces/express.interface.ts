@@ -5,7 +5,7 @@ import { Request as Req, Response as Res, NextFunction } from "express";
 
 type IProperty = "query" | "body" | "params" | "user";
 interface IRequest<B = undefined, P = undefined, Q = undefined> extends Req {
-  body: B;
+  body: B & { [x: string]: [y: any] };
   query: Q & ParsedQs;
   params: P & ParamsDictionary;
 };

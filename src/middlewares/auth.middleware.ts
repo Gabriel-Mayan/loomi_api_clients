@@ -1,6 +1,5 @@
-import { UserRepository } from "../repositories/user.repository";
-
 import { validateToken } from "../utils/token.util";
+import { UserRepository } from "../repositories/user.repository";
 import { AuthMiddleware } from "../interfaces/express.interface";
 
 export const authentication: AuthMiddleware = async (request, response, next) => {

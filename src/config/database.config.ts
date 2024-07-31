@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { config } from "dotenv";
 import { DataSourceOptions } from "typeorm";
-import { Banking } from "../entities/banking.entity";
+import { Account } from "../entities/account.entity";
 import { Transaction } from "../entities/transaction.entity";
 import { User } from "../entities/user.entity";
 
@@ -17,7 +17,7 @@ export const databaseConfig: DataSourceOptions = {
     database: process.env.DB_DATABASE,
     synchronize: false,
     logging: false,
-    entities: [Banking, Transaction, User],
+    entities: [Account, Transaction, User],
     migrations: [],
     subscribers: [],
 };

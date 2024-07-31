@@ -1,6 +1,7 @@
 import { FindOptionsWhere, InsertResult, UpdateResult } from "typeorm";
 
 import { User } from "../entities/user.entity";
+import { Account } from "../entities/account.entity";
 
 import { IDatabaseUser } from "../interfaces/user.interface";
 
@@ -12,20 +13,40 @@ export const UserRepository = {
     getUserById({ id }: { id: string }) {
         return repository.findOneBy({ id });
     },
+    
+    createUser({ cpf, name, email, address, password }: { cpf: string, name: string, email: string, address: string, password: string }) {
+        return repository.manager.transaction(async (transaction) => {
+            const account = new Account();
+            const insertedAccount = await transaction.save(account);
+    
+            const user = new User();
+            user.cpf = cpf;
+            user.name = name;
+            user.email = email;
+            user.address = address;
+            user.password = password;
+    
+            user.account = account;
+    
+            const insertedUser = await transaction.save(user);
 
-    findUser(query: FindOptionsWhere<User>): Promise<IDatabaseUser | null> {
-        return repository.findOneBy({ deletedAt: undefined, ...query });
+            account.user = insertedUser;
+
+            await transaction.save(account);
+    
+            return { user: insertedUser, account: insertedAccount };
+        });
     },
 
-    createUser(user: any): Promise<InsertResult> {
-        return repository.insert(user);
-    },
-
-    updateUser(id: string, updatedData: any): Promise<UpdateResult> {
-        return repository.update({ id }, updatedData);
+    updateUser({ id, address, email }: { id: string, email?: string, address?: string }): Promise<UpdateResult> {
+        return repository.update({ id }, { address, email });
     },
 
     deleteUser({ id }: { id: string }): Promise<UpdateResult> {
         return repository.update({ id }, { deletedAt: new Date() });
+    },
+
+    findUser(query: FindOptionsWhere<User>): Promise<IDatabaseUser | null> {
+        return repository.findOneBy({ deletedAt: undefined, ...query });
     },
 };

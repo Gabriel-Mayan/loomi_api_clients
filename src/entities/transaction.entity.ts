@@ -1,4 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, ManyToOne, Check, JoinColumn } from 'typeorm';
+import { 
+  Check, 
+  Entity, 
+  Column, 
+  ManyToOne, 
+  JoinColumn, 
+  CreateDateColumn, 
+  UpdateDateColumn, 
+  DeleteDateColumn, 
+  PrimaryGeneratedColumn, 
+} from 'typeorm';
+
 import { User } from './user.entity';
 
 @Entity('transactions')

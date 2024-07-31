@@ -1,5 +1,16 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, DeleteDateColumn, OneToMany } from 'typeorm';
-import { Banking } from './banking.entity';
+import {
+    Entity,
+    Column,
+    OneToOne,
+    OneToMany,
+    JoinColumn,
+    CreateDateColumn,
+    UpdateDateColumn,
+    DeleteDateColumn,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
+
+import { Account } from './account.entity';
 import { Transaction } from './transaction.entity';
 
 @Entity('users')
@@ -12,13 +23,19 @@ export class User {
 
     @Column("varchar", { length: 255, nullable: false, unique: true })
     email: string;
+    
+    @Column("varchar", { length: 14, nullable: false, unique: true })
+    cpf: string;
+    
+    @Column("varchar", { length: 255, nullable: false, unique: true })
+    password: string;
 
     @Column('text')
     address: string;
 
     @Column('text', { nullable: true, unique: true })
     profilePicture: string;
-    
+
     @CreateDateColumn({ type: "timestamp" })
     createdAt: Date;
 
@@ -28,13 +45,13 @@ export class User {
     @DeleteDateColumn({ type: "timestamp", nullable: true })
     deletedAt: Date;
 
-    @OneToOne(() => Banking, banking => banking.user)
+    @OneToOne(() => Account, banking => banking.user)
     @JoinColumn()
-    banking: Banking;
-  
+    account: Account;
+
     @OneToMany(() => Transaction, transaction => transaction.senderUser)
     sentTransactions: Transaction[];
-  
+
     @OneToMany(() => Transaction, transaction => transaction.receiverUser)
     receivedTransactions: Transaction[];
 }
