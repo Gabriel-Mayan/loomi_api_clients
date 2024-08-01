@@ -1,14 +1,22 @@
 
 import { Request } from '../interfaces/express.interface';
-import { IRequestCreateUser, IRequestUpdateUser, IRequestUserPasswordRecoveryLinkSchema } from '../interfaces/user.interface';
+import {
+    IRequestCreateUser,
+    IRequestUpdateUser,
+    IRequestUpdateUserPasswordSchema,
+    IRequestUpdateUserProfilePictureSchema,
+    IRequestUserPasswordRecoveryLinkSchema,
+} from '../interfaces/user.interface';
 
 import { UserRepository } from '../repositories/user.repository';
 import { RecoveryPasswordRepository } from '../repositories/recovery-password.repository';
 
+import { getBase64Info } from '../utils/base64.util';
 import { addTime, isAfterDate } from '../utils/date.util';
-import { encryptPassword } from '../utils/encryptation.util';
+import { comparePassword, encryptPassword } from '../utils/encryptation.util';
 
 import { recoveryPasswordMailSend } from '../helpers/mail.helper';
+import { insertArchiveInBucket } from '../services/bucket.service';
 import { InternalError, NotFoundError, RequestFieldError } from '../services/error.service';
 
 export const getUsers: Request = async (request, response) => {
@@ -28,7 +36,7 @@ export const getUserById: Request = async (request, response) => {
 export const createUser: Request<IRequestCreateUser> = async (request, response) => {
     const { name, email, address, password, cpf } = request.body;
 
-    const encryptedPassword = await encryptPassword(password);
+    const encryptedPassword = await encryptPassword({ password });
 
     await UserRepository.createUser({ cpf, name, email, address, password: encryptedPassword });
 
@@ -60,14 +68,44 @@ export const deleteUser: Request = async (request, response) => {
     return response.status(200).send({ message: "User deleted successfully!" });
 };
 
-// TODO
-export const updateUserPassword: Request = async (request, response) => {
-    return response.status(200).send({});
+export const updateUserPassword: Request<IRequestUpdateUserPasswordSchema> = async (request, response) => {
+    const { user } = request;
+    const { password, oldPassword } = request.body;
+
+    const oldPasswordValid = await comparePassword({ password: oldPassword, comparePassword: user.password });
+
+    if (!oldPasswordValid) {
+        throw new RequestFieldError("Error when updating password...");
+    }
+
+    const newPassword = await encryptPassword({ password });
+    const userUpdated = await UserRepository.updateUser({ id: user.id, password: newPassword });
+
+    if (!userUpdated.affected) {
+        throw new InternalError("Error when updating password...");
+    }
+
+    return response.status(200).send({ message: "Password updated successfully!" });
 };
 
-// TODO
-export const updateUserProfilePicture: Request = async (request, response) => {
-    return response.status(200).send({});
+export const updateUserProfilePicture: Request<IRequestUpdateUserProfilePictureSchema> = async (request, response) => {
+    const { user } = request;
+    const { profilePicture } = request.body;
+
+    const { extension, archive } = getBase64Info({ base64: profilePicture });
+    
+    const folder = 'profile_pictures';
+    const fileName = `profile_${user.id}.${extension}`;
+
+    const { url } = await insertArchiveInBucket({ folder, fileName, file: archive, fileExtension: extension });
+
+    const userUpdated = await UserRepository.updateUser({ id: user.id, profilePicture: url });
+
+    if (!userUpdated.affected) {
+        throw new InternalError("Error when updating password...");
+    }
+
+    return response.status(200).send({ url });
 };
 
 export const requestUserPasswordRecoveryLink: Request<IRequestUserPasswordRecoveryLinkSchema> = async (request, response) => {
@@ -109,11 +147,11 @@ export const updateUserPasswordWithRecoveryLink: Request = async (request, respo
         throw new RequestFieldError("Request timeout expired...");
     }
 
-    const newPassword = await encryptPassword(password);
+    const newPassword = await encryptPassword({ password });
     const userUpdated = await UserRepository.updateUser({ id: registeredRequest.user.id, password: newPassword });
 
     if (!userUpdated.affected) {
-        throw new InternalError("Error when updating password....");
+        throw new InternalError("Error when updating password...");
     }
 
     return response.status(200).send({ message: "Password retrieved successfully!" });

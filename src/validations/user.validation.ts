@@ -22,6 +22,19 @@ export const updateUserSchema = z.object({
   message: 'At least one field (email or address) must be provided.',
 });
 
+export const updateUserProfilePictureSchema = z.object({
+  profilePicture: z.string().base64(),
+});
+
+export const updateUserPasswordSchema = z.object({
+  password: z.string().min(6),
+  oldPassword: z.string().min(6),
+  confirmPassword: z.string().min(6),
+}).refine(data => data.password === data.confirmPassword, {
+  path: ["confirmPassword"],
+  message: "Password and confirmPassword must match",
+});
+
 export const requestUserPasswordRecoveryLinkSchema = z.object({
   email: z.string().email(),
 });

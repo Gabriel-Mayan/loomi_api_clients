@@ -15,7 +15,7 @@ export const login: Request<IRequestLogin> = async (request, response) => {
       throw new RequestFieldError("Username or password is invalid");
     }
 
-    const verifiedPassword = await comparePassword(password, user.password);
+    const verifiedPassword = await comparePassword({password, comparePassword: user.password});
 
     if (!verifiedPassword) {
       throw new RequestFieldError("Username or password is invalid");
