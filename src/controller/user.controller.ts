@@ -76,7 +76,7 @@ export const requestUserPasswordRecoveryLink: Request<IRequestUserPasswordRecove
     const user = await UserRepository.findUser({ email });
 
     if (!user) {
-        throw new NotFoundError("User does not exist");
+        throw new NotFoundError("Is user exists mail has sent!");
     }
 
     const databaseRecovery = await RecoveryPasswordRepository.createRecovery({
@@ -90,31 +90,31 @@ export const requestUserPasswordRecoveryLink: Request<IRequestUserPasswordRecove
 
     await recoveryPasswordMailSend({ to: user.email, code: databaseRecovery.identifiers[0] });
 
-    return response.status(200).send({ message: "Request successfully sent!" });
+    return response.status(200).send({ message: "Is user exists mail has sent!" });
 };
 
 export const updateUserPasswordWithRecoveryLink: Request = async (request, response) => {
     const { code } = request.params;
     const { password } = request.body;
-  
+
     const registeredRequest = await RecoveryPasswordRepository.findRecovery({ id: code });
-  
+
     if (!registeredRequest || !registeredRequest.mailSent) {
         throw new RequestFieldError("Request does not exist...");
     }
-  
+
     const expiredTime = isAfterDate(new Date(), registeredRequest.expiresIn);
-  
+
     if (expiredTime) {
         throw new RequestFieldError("Request timeout expired...");
     }
-  
+
     const newPassword = await encryptPassword(password);
-    const userUpdated = await UserRepository.updateUser({id: registeredRequest.user.id, password: newPassword });
-  
+    const userUpdated = await UserRepository.updateUser({ id: registeredRequest.user.id, password: newPassword });
+
     if (!userUpdated.affected) {
         throw new InternalError("Error when updating password....");
     }
-  
+
     return response.status(200).send({ message: "Password retrieved successfully!" });
 };

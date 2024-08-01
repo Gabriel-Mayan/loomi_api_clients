@@ -6,7 +6,7 @@ import { requestUserPasswordRecoveryLinkSchema } from "../validations/user.valid
 
 const routes = Router();
 
-routes.post("/", validateRequest(requestUserPasswordRecoveryLinkSchema), requestUserPasswordRecoveryLink);
+routes.post("/", validateRequest(requestUserPasswordRecoveryLinkSchema, 'body'), requestUserPasswordRecoveryLink);
 routes.patch("/:code", updateUserPasswordWithRecoveryLink);
 
 export { routes };
