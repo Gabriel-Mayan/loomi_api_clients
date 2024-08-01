@@ -1,9 +1,15 @@
+import { QueryFailedError } from "typeorm";
 import { ErrorMiddleware } from "../interfaces/express.interface";
+import { DatabaseError } from "../services/error.service";
 
 const handleError: ErrorMiddleware = (error, request, response, next) => {
-    console.log(error);
+    if(error instanceof QueryFailedError) {
+        const err = new DatabaseError('Database operation failed', error.message);
+        
+        return err.sendError(response);    
+    };
 
-    return response.status(400).send({ message: error.message });
+    return error.sendError(response);
 };
 
 export default handleError;

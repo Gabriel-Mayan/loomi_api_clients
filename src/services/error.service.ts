@@ -9,6 +9,18 @@ import {
     HTTP_UNAUTHORIZED,
     HTTP_INTERNAL_SERVER_ERROR,
 } from '../utils/error.util';
+import { QueryFailedError } from 'typeorm';
+
+
+export type TCustomErrors = (
+    ConflitError |
+    DatabaseError |
+    InternalError |
+    NotFoundError |
+    RequestFieldError |
+    AuthenticationError |
+    QueryFailedError
+);
 
 class BaseError extends Error {
     public type: string;
@@ -148,6 +160,21 @@ export class ValidationError extends BaseError {
 
         return issues.map((err) => {
             return { name: err.path[0] as string, reason: err.message };
+        });
+    }
+}
+export class DatabaseError extends BaseError {
+    constructor(
+        message: string,
+        details: string = '',
+        { title = 'Database Error', type = 'about:blank', extras = {} } = {}
+    ) {
+        super(HTTP_BAD_REQUEST, {
+            type,
+            title,
+            details,
+            message,
+            extras,
         });
     }
 }

@@ -4,6 +4,7 @@ import { DataSourceOptions } from "typeorm";
 import { Account } from "../entities/account.entity";
 import { Transaction } from "../entities/transaction.entity";
 import { User } from "../entities/user.entity";
+import { RecoveryPassword } from "../entities/recovery-password.entity";
 
 config();
 
@@ -17,7 +18,7 @@ export const databaseConfig: DataSourceOptions = {
     database: process.env.DB_DATABASE,
     synchronize: false,
     logging: false,
-    entities: [Account, Transaction, User],
+    entities: [Account, Transaction, User, RecoveryPassword],
     migrations: [],
     subscribers: [],
 };
