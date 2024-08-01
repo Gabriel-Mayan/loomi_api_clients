@@ -18,6 +18,8 @@ export const createUserSchema = z.object({
 export const updateUserSchema = z.object({
   email: z.string().email().optional(),
   address: z.string().optional(),
+}).refine(data => data.email || data.address, {
+  message: 'At least one field (email or address) must be provided.',
 });
 
 export const requestUserPasswordRecoveryLinkSchema = z.object({

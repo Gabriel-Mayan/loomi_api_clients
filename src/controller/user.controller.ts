@@ -11,6 +11,12 @@ import { encryptPassword } from '../utils/encryptation.util';
 import { recoveryPasswordMailSend } from '../helpers/mail.helper';
 import { InternalError, NotFoundError, RequestFieldError } from '../services/error.service';
 
+export const getUsers: Request = async (request, response) => {
+    const user = await UserRepository.listUsers();
+
+    return response.status(200).send({ user });
+};
+
 export const getUserById: Request = async (request, response) => {
     const { id } = request.params;
 

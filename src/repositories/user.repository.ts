@@ -1,4 +1,4 @@
-import { FindOptionsWhere, InsertResult, UpdateResult } from "typeorm";
+import { FindOptionsWhere, IsNull, UpdateResult } from "typeorm";
 
 import { User } from "../entities/user.entity";
 import { Account } from "../entities/account.entity";
@@ -11,7 +11,17 @@ const repository = AppDataSource.getRepository(User);
 
 export const UserRepository = {
     getUserById({ id }: { id: string }) {
-        return repository.findOneBy({ id });
+        return repository.findOne({ 
+            where: { id },
+            select: ['id', 'name', 'email']
+        });
+    },
+    
+    listUsers() {
+        return repository.find({
+            where: { deletedAt: IsNull() },
+            select: ['id', 'name'],
+          });
     },
     
     createUser({ cpf, name, email, address, password }: { cpf: string, name: string, email: string, address: string, password: string }) {
