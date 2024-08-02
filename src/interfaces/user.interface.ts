@@ -5,7 +5,7 @@ import {
     updateUserPasswordSchema,
     updateUserProfilePictureSchema,
     requestUserPasswordRecoveryLinkSchema,
-} from "src/validations/user.validation";
+} from "../validations/user.validation";
 
 export type IRequestCreateUser = z.infer<typeof createUserSchema>;
 export type IRequestUpdateUser = z.infer<typeof updateUserSchema>;

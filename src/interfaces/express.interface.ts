@@ -2,7 +2,7 @@ import { ParsedQs } from "qs";
 import { ZodTypeAny } from "zod";
 import { ParamsDictionary } from "express-serve-static-core";
 import { Request as Req, Response as Res, NextFunction } from "express";
-import { TCustomErrors } from "src/services/error.service";
+import { TCustomErrors } from "../services/error.service";
 
 type IProperty = "query" | "body" | "params" | "user";
 interface IRequest<B = undefined, P = undefined, Q = undefined> extends Req {
