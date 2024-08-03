@@ -13,6 +13,22 @@ export type IRequestUpdateUserPasswordSchema = z.infer<typeof updateUserPassword
 export type IRequestUpdateUserProfilePictureSchema = z.infer<typeof updateUserProfilePictureSchema>;
 export type IRequestUserPasswordRecoveryLinkSchema = z.infer<typeof requestUserPasswordRecoveryLinkSchema>;
 
+export type ICreateUser =  { 
+    cpf: string, 
+    name: string, 
+    email: string, 
+    address: string, 
+    password: string, 
+};
+
+export type IUpdateUser = { 
+    id: string, 
+    email?: string, 
+    address?: string, 
+    password?: string, 
+    profilePicture?: string 
+};
+
 export type IDatabaseUser = {
     id: string;
     cpf: string;
