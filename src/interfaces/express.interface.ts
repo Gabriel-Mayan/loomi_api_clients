@@ -17,5 +17,5 @@ export interface Next extends NextFunction { };
 export type Request<B = undefined, P = undefined, Q = undefined> = (request: IRequest<B, P, Q>, response: Response) => Promise<Response>;
 
 export type AuthMiddleware = (request: IRequest, response: Response, next: Next) => void;
-export type ErrorMiddleware = (error: TCustomErrors, request: IRequest, response: Response, next: Next) => Response;
+export type ErrorMiddleware = (error: Error, request: IRequest, response: Response, next: Next) => Response;
 export type ValidationMiddleware = (schema: ZodTypeAny, property?: IProperty) => (request: IRequest, response: Response, next: Next) => void;

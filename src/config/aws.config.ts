@@ -7,8 +7,10 @@ const { AWS_REGION, ACESS_KEY_ID_AWS, SECRET_ACESS_KEY, BUCKET_NAME } = process.
 
 export const bucketConfig: S3.ClientConfiguration = {    
     region: AWS_REGION,
-    accessKeyId: ACESS_KEY_ID_AWS,
-    secretAccessKey: SECRET_ACESS_KEY,
+    credentials: {
+        accessKeyId: ACESS_KEY_ID_AWS || "",
+        secretAccessKey: SECRET_ACESS_KEY || "",
+    },
 };
 
-export const bucketName = BUCKET_NAME
+export const bucketName = BUCKET_NAME || ""
