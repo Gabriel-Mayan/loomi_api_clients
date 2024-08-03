@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "server.ts",
-  "engines": { "node": "18" },
+  "engines": { "node": "20" },
   "scripts": {
     "dev": "ts-node-dev src/server.ts",
     "build": "tsc",

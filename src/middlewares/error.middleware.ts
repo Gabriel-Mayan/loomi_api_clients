@@ -1,6 +1,6 @@
 import { QueryFailedError } from "typeorm";
 import { ErrorMiddleware } from "../interfaces/express.interface";
-import { DatabaseError, ConflitError, InternalError, NotFoundError, RequestFieldError, AuthenticationError } from "../services/error.service";
+import { DatabaseError, ConflitError, InternalError, NotFoundError, RequestFieldError, AuthenticationError, ValidationError } from "../services/error.service";
 
 const handleError: ErrorMiddleware = (error, request, response, next) => {
     if(error instanceof QueryFailedError) {
@@ -14,6 +14,7 @@ const handleError: ErrorMiddleware = (error, request, response, next) => {
         error instanceof DatabaseError ||
         error instanceof InternalError ||
         error instanceof NotFoundError ||
+        error instanceof ValidationError ||
         error instanceof RequestFieldError ||
         error instanceof AuthenticationError
     ) {
