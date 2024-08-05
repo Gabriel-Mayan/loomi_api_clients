@@ -22,11 +22,12 @@ services:
     expose:
       - "9093"
     environment:
+      KAFKA_BROKER_ID: 1
       KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181    
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_CREATE_TOPICS: "recovery-password:1:1,recovery-password-mail-sent:1:1"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
@@ -34,33 +35,6 @@ services:
   api-client:
     build:
       context: ./
-    ports:
-      - "3002:3000"
-    environment:
-      - PORT=3002
-      - HOST=localhost
-      - DB_CLIENT=postgres
-      - DB_HOST=db
-      - DB_PORT=5432
-      - DB_USERNAME=postgres
-      - DB_PASSWORD=postgres
-      - DB_DATABASE=postgres
-      - ACESS_KEY_ID_AWS=
-      - SECRET_ACESS_KEY=
-      - AWS_REGION=us-east-1
-      - BUCKET_NAME=loomibank
-      - JWT_SECRET=jwts
-      - USE_SSL=
-      - BROKER_SSL=
-      - BROKER=kafka:9092
-      - BROKER_GROUP_ID=
-    depends_on:
-      - db
-      - kafka
-
-  api-transaction:
-    build:
-      context: ../loomi_api_transaction
     ports:
       - "3001:3000"
     environment:
@@ -77,10 +51,37 @@ services:
       - AWS_REGION=us-east-1
       - BUCKET_NAME=loomibank
       - JWT_SECRET=jwts
-      - USE_SSL=
+      - BROKER=kafka:9093
+      - BROKER_GROUP_ID=my-consumer-group
+      - USE_SSL=0
       - BROKER_SSL=
-      - BROKER=kafka:9092
-      - BROKER_GROUP_ID=
+    depends_on:
+      - db
+      - kafka
+
+  api-transaction:
+    build:
+      context: ../loomi_api_transaction
+    ports:
+      - "3002:3000"
+    environment:
+      - PORT=3002
+      - HOST=localhost
+      - DB_CLIENT=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=postgres
+      - ACESS_KEY_ID_AWS=
+      - SECRET_ACESS_KEY=
+      - AWS_REGION=us-east-1
+      - BUCKET_NAME=loomibank
+      - JWT_SECRET=jwts
+      - BROKER=kafka:9093
+      - BROKER_GROUP_ID=my-consumer-group
+      - USE_SSL=0
+      - BROKER_SSL=
     depends_on:
       - db
       - kafka
