@@ -1,0 +1,87 @@
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092
+      KAFKA_LISTENER_NAME: INSIDE
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      - zookeeper
+
+  api-client:
+    build:
+      context: ./
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - HOST=localhost
+      - DB_CLIENT=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=postgres
+      - ACESS_KEY_ID_AWS=
+      - SECRET_ACESS_KEY=
+      - AWS_REGION=us-east-1
+      - BUCKET_NAME=loomibank
+      - JWT_SECRET=jwts
+      - USE_SSL=
+      - BROKER_SSL=
+      - BROKER=kafka:9092
+      - BROKER_GROUP_ID=
+    depends_on:
+      - db
+      - kafka
+
+  api-transaction:
+    build:
+      context: ../loomi_api_transaction
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - HOST=localhost
+      - DB_CLIENT=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USERNAME=postgres
+      - DB_PASSWORD=postgres
+      - DB_DATABASE=postgres
+      - ACESS_KEY_ID_AWS=
+      - SECRET_ACESS_KEY=
+      - AWS_REGION=us-east-1
+      - BUCKET_NAME=loomibank
+      - JWT_SECRET=jwts
+      - USE_SSL=
+      - BROKER_SSL=
+      - BROKER=kafka:9092
+      - BROKER_GROUP_ID=
+    depends_on:
+      - db
+      - kafka
+
+volumes:
+  db_data:
