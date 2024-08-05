@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "ts-node-dev src/server.ts",
     "build": "tsc",
-    "start": "node build/src/server.js",
+    "start": "node build/server.js",
     "lint": "eslint --ext .ts",
     "lint:fix": "yarn lint --fix"
   },
