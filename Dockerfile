@@ -1,10 +1,10 @@
 FROM node:20
 
-WORKDIR /app
+WORKDIR /
 
 COPY package.json yarn.lock ./
 
-RUN yarn install --production --ignore-engines
+RUN npm install yarn && yarn install --production
 
 COPY . .
 
